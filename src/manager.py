@@ -1,26 +1,22 @@
-"""
-Manager class for handling apartment management operations.
-"""
+"""Manager class for handling apartment management operations."""
 
-from typing import List
 from datetime import datetime
 
 from src.models import (
     Apartment,
+    ApartmentEvent,
+    ApartmentSettlement,
     Bill,
     Parameters,
     Tenant,
-    ApartmentEvent,
     TenantBlacklistEntry,
     TenantSettlement,
     Transfer,
-    ApartmentSettlement,
 )
 
 
 class Manager:
-    """
-    Manager class responsible for loading data and providing methods
+    """Manager class responsible for loading data and providing methods
     to manage apartments, tenants, transfers, bills, and apartment events.
     """
 
@@ -38,23 +34,32 @@ class Manager:
 
     def load_data(self):
         """Load data from JSON files specified in the parameters."""
+        """
+        Example:
+        ----
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.load_data()
+        """
         self.apartments = Apartment.from_json_file(self.parameters.apartments_json_path)
         self.tenants = Tenant.from_json_file(self.parameters.tenants_json_path)
         self.transfers = Transfer.from_json_file(self.parameters.transfers_json_path)
         self.bills = Bill.from_json_file(self.parameters.bills_json_path)
         self.tenants_blacklist = TenantBlacklistEntry.from_json_file(
-            self.parameters.tenants_blacklist_json_path
+            self.parameters.tenants_blacklist_json_path,
         )
 
     def load_additional_data(self):
         """Load additional data such as apartment events from JSON files."""
         self.apartment_events = ApartmentEvent.from_json_file(
-            self.parameters.apartment_events_json_path
+            self.parameters.apartment_events_json_path,
         )
 
     def generate_apartment_events_report(
-        self, apartment_key: str, only_unsolved: bool = True
-    ) -> List[ApartmentEvent]:
+        self,
+        apartment_key: str,
+        only_unsolved: bool = True,
+    ) -> list[ApartmentEvent]:
         """Generate a report of apartment events for a given apartment key."""
         if apartment_key not in self.apartments:
             raise ValueError("Apartment key does not exist")
@@ -77,9 +82,20 @@ class Manager:
         return self.apartments.get(apartment_key, None)
 
     def get_apartment_costs(
-        self, apartment_key: str, year: int = None, month: int = None
+        self,
+        apartment_key: str,
+        year: int = None,
+        month: int = None,
     ) -> float | None:
-        """Calculate the total costs for a given apartment, optionally filtered by year/month."""
+        """Calculate the total costs for a given apartment, optionally filtered by year/month.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.get_apartment_costs('apt-1', year=2023, month=4)
+
+        """
         if month is not None and (month < 1 or month > 12):
             raise ValueError("Month must be between 1 and 12")
         if apartment_key not in self.apartments:
@@ -95,9 +111,20 @@ class Manager:
         return total_cost
 
     def get_settlement(
-        self, apartment_key: str, year: int, month: int
+        self,
+        apartment_key: str,
+        year: int,
+        month: int,
     ) -> ApartmentSettlement | None:
-        """Get the apartment settlement for a given apartment key, year, and month."""
+        """Get the apartment settlement for a given apartment key, year, and month.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.get_settlement('apt-1', 2023, 4)
+
+        """
         if month < 1 or month > 12:
             raise ValueError("Month must be between 1 and 12")
         if apartment_key not in self.apartments:
@@ -115,9 +142,19 @@ class Manager:
         )
 
     def create_tenants_settlements(
-        self, apartment_settlement: ApartmentSettlement
-    ) -> List[TenantSettlement] | None:
-        """Create tenant settlements based on the apartment settlement."""
+        self,
+        apartment_settlement: ApartmentSettlement,
+    ) -> list[TenantSettlement] | None:
+        """Create tenant settlements based on the apartment settlement.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> settlement = manager.get_settlement('apt-1', 2023, 4)
+            >>> manager.create_tenants_settlements(settlement)
+
+        """
         if apartment_settlement.month < 1 or apartment_settlement.month > 12:
             raise ValueError("Month must be between 1 and 12")
         if apartment_settlement.apartment not in self.apartments:
@@ -142,8 +179,16 @@ class Manager:
             for tenant in tenants_in_apartment
         ]
 
-    def get_debtors(self, apartment_key: str, year: int, month: int) -> List[str]:
-        """Get a list of tenant names (debtors) for a given apartment key, year, and month."""
+    def get_debtors(self, apartment_key: str, year: int, month: int) -> list[str]:
+        """Get a list of tenant names (debtors) for a given apartment key, year, and month.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.get_debtors('apt-1', 2023, 4)
+
+        """
         if month < 1 or month > 12:
             raise ValueError("Month must be between 1 and 12")
         output = []
@@ -169,7 +214,15 @@ class Manager:
         return output
 
     def calculate_tax(self, year: int, month: int, tax_rate: float) -> float:
-        """Calculate the tax amount based on the total income from transfers."""
+        """Calculate the tax amount based on the total income from transfers.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.calculate_tax(2023, 4, tax_rate=0.19)
+
+        """
         total_income = sum(
             transfer.amount_pln
             for transfer in self.transfers
@@ -178,7 +231,15 @@ class Manager:
         return round(total_income * tax_rate, 0)
 
     def check_deposits(self) -> float:
-        """Check if the total deposits from tenants cover the total due amounts."""
+        """Check if the total deposits from tenants cover the total due amounts.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.check_deposits()
+
+        """
         total_deposits = 0.0
         total_due = 0.0
         for _, tenant in self.tenants.items():
@@ -193,7 +254,15 @@ class Manager:
         return total_deposits - total_due
 
     def get_annual_balance(self, year: int) -> float:
-        """Calculate the annual balance for a given year based on transfers and bills."""
+        """Calculate the annual balance for a given year based on transfers and bills.
+
+        Example:
+        -------
+            >>> params = Parameters()
+            >>> manager = Manager(params)
+            >>> manager.get_annual_balance(2023)
+
+        """
         total_income = sum(
             transfer.amount_pln
             for transfer in self.transfers

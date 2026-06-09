@@ -103,6 +103,13 @@ class Apartment(BaseModel):
         If the JSON root element is not a dictionary.
 
         """
+        """
+        Example:
+        ----
+            >>> apartments = Apartment.from_json_file('data/apartments.json')
+            >>> isinstance(apartments, dict)
+            True
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
@@ -148,7 +155,15 @@ class Tenant(BaseModel):
 
     @staticmethod
     def from_json_file(file_path: str) -> dict[str, "Tenant"]:
-        """Load tenants from a JSON file and return a dictionary of Tenant instances."""
+        """Load tenants from a JSON file and return a dictionary of Tenant instances.
+
+        Example:
+        -------
+            >>> tenants = Tenant.from_json_file('data/tenants.json')
+            >>> isinstance(tenants, dict)
+            True
+
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
@@ -164,7 +179,15 @@ class TenantBlacklistEntry(BaseModel):
 
     @staticmethod
     def from_json_file(file_path: str) -> list["TenantBlacklistEntry"]:
-        """Load tenant blacklist entries from a JSON file."""
+        """Load tenant blacklist entries from a JSON file.
+
+        Example:
+        -------
+            >>> blacklist = TenantBlacklistEntry.from_json_file('data/tenants_blacklist.json')
+            >>> isinstance(blacklist, list)
+            True
+
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
@@ -184,7 +207,15 @@ class Transfer(BaseModel):
 
     @staticmethod
     def from_json_file(file_path: str) -> list["Transfer"]:
-        """Load transfers from a JSON file and return a list of Transfer instances."""
+        """Load transfers from a JSON file and return a list of Transfer instances.
+
+        Example:
+        -------
+            >>> transfers = Transfer.from_json_file('data/transfers.json')
+            >>> isinstance(transfers, list)
+            True
+
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
@@ -204,7 +235,15 @@ class Bill(BaseModel):
 
     @staticmethod
     def from_json_file(file_path: str) -> list["Bill"]:
-        """Load bills from a JSON file and return a list of Bill instances."""
+        """Load bills from a JSON file and return a list of Bill instances.
+
+        Example:
+        -------
+            >>> bills = Bill.from_json_file('data/bills.json')
+            >>> isinstance(bills, list)
+            True
+
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
@@ -252,7 +291,15 @@ class ApartmentEvent(BaseModel):
 
     @staticmethod
     def from_json_file(file_path: str) -> list["ApartmentEvent"]:
-        """Load apartment events from a JSON file."""
+        """Load apartment events from a JSON file.
+
+        Example:
+        -------
+            >>> events = ApartmentEvent.from_json_file('data/apartment_events.json')
+            >>> isinstance(events, list)
+            True
+
+        """
         data = None
         with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
