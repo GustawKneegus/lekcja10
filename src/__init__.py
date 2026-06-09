@@ -46,4 +46,5 @@ Authors
 ------
 Łukasz Kułacz - initial implementation, testing, documentation
 
+Daniel Bączkiewicz - student
 """
